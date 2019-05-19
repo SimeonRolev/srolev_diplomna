@@ -1,20 +1,41 @@
 document.addEventListener('DOMContentLoaded', function () {
-    document.querySelector('button').addEventListener('click', countWords, false)
-    
-    function countWords () {
+
+    function notifyActiveTab (actionName, responseCallback) {
         chrome.tabs.query({
             currentWindow: true,
             active: true
         },
         function (tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, 'hi', handleCountWordsResponse)
+            chrome.tabs.sendMessage(
+                tabs[0].id,
+                { action: actionName },
+                responseCallback
+            )
         })
     }
 
-    function handleCountWordsResponse (res) {
-        const div = document.createElement('div')
-        div.textContent = `${res.count} matches found`
-        document.body.appendChild(div)
+    function fillInForm (resp) {
+        if (resp.word) {
+            let word = document.getElementById('word').textContent = resp.word
+            let urlDiv = document.getElementById('url').textContent = resp.url
+            let notes = document.getElementById('notes')  // textarea
+    
+            // TODO: add translations widget that requests the translation aggregator
+            document.getElementById('save-btn').onclick = function () {
+                save({ word, urlDiv, notes })
+            }
+        } else {
+            notifyActiveTab('noSelectionFound')
+        }
     }
 
+    function getSelected () {
+        notifyActiveTab('getSelection', fillInForm)
+    }
+
+    function save (contents) {
+        alert(`Saving word: ${contents.word}`)
+    }
+
+    getSelected()
 }, false)

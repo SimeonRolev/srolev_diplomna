@@ -1,14 +1,37 @@
-// This one is loaded and embedded in the chrome page
-// Read the page contents from here
+// This script is loaded and embedded in the chrome page
 
-// Handle a request to the contents of the page by the popup
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    // Request would be the message that was sent
-    const re = RegExp('bear', 'gi')
-    const matches = document.documentElement.innerHTML.match(re)
-    const matchesCount = matches ? matches.length : 0
+function getSelectionText() {
+    var text = "";
+    if (window.getSelection) {
+        text = window.getSelection().toString();
+    } else if (document.selection && document.selection.type != "Control") {
+        text = document.selection.createRange().text;
+    }
+    return text;
+}
+
+const getSelectionHandler = function (_, _, sendResponse) {
     sendResponse({
-        count: matchesCount
+        word: getSelectionText(),
+        url: window.location.href
     }); 
-    return true;
+}
+
+const noSelectionFound = function () {
+    alert('You have not selected a word for translation. Note: some sites or elements don\'t support selection.')
+}
+
+const reducers = {
+    'getSelection': getSelectionHandler,
+    'noSelectionFound': noSelectionFound
+}
+
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+    try {
+        reducers[message.action].call(this, message, sender, sendResponse)
+        return true
+    } catch (err) {
+        console.log(`Error occured when trying to call action ${message}`)
+        console.log(err)
+    }
 })
