@@ -1,26 +1,40 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+/* global chrome */
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reloadddd.
+import React from 'react';
+import './App.css';
+import Popup from './components/Popup'
+
+
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {showHeader: true};
+    this.handleClick = this.handleClick.bind(this);
+    chrome.runtime.sendMessage('lmkogeccaibbphgfghallpflabohoahj',{action: "popupOpen"});
+
+  }
+
+  handleClick() {
+    console.log('clicked');
+    this.setState( prevState => ({
+      showHeader: !prevState.showHeader
+    }));
+  }
+  render() {
+    return (
+      <div className="App">
+        <div className="App-header">
+          {this.state.showHeader && <h2>Welcome to React Jon</h2>}
+        </div>
+        <p className="App-intro">
+          To get started, edit <code>src/App.js</code> and save to reload.
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+        <button onClick={this.handleClick}>
+          {this.state.showHeader ? "HIDE" : "SHOW"}
+        </button>
+      </div>
+    );
+  }
 }
 
 export default App;
