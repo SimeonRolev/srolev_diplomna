@@ -21,9 +21,14 @@ const noSelectionFound = function () {
     alert('You have not selected a word for translation. Note: some sites or elements don\'t support selection.')
 }
 
+const saveWord = function (message, _, _) {
+    alert(`Successfully saved word "${message.args.word}"`)
+}
+
 const reducers = {
     'getSelection': getSelectionHandler,
-    'noSelectionFound': noSelectionFound
+    'noSelectionFound': noSelectionFound,
+    'saveWord': saveWord
 }
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {

@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    function notifyActiveTab (actionName, responseCallback) {
+    function notifyActiveTab (actionName, responseCallback, receiverArgs) {
         chrome.tabs.query({
             currentWindow: true,
             active: true
@@ -8,7 +8,10 @@ document.addEventListener('DOMContentLoaded', function () {
         function (tabs) {
             chrome.tabs.sendMessage(
                 tabs[0].id,
-                { action: actionName },
+                { 
+                    action: actionName,
+                    args: receiverArgs 
+                },
                 responseCallback
             )
         })
@@ -32,9 +35,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function getSelected () {
         notifyActiveTab('getSelection', fillInForm)
     }
-
+    
     function save (contents) {
-        alert(`Saving word: ${contents.word}`)
+        notifyActiveTab('saveWord', null, contents)
     }
 
     getSelected()
