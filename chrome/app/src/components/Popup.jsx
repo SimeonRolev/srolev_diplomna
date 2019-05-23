@@ -12,7 +12,7 @@ class Popup extends Component {
     }
 
     componentDidMount () {
-        this.props.notify('getSelection', this.fillInForm)
+        this.props.notify('getSelection')
     }
 
     fillInForm = (resp) => {

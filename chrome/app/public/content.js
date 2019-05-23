@@ -22,16 +22,18 @@ const noSelectionFound = function () {
 }
 
 const saveWord = function (message, _, _) {
-    alert(`Successfully saved word "${message.args.word}"`)
+    alert(`Successfully saved word "${message}"`)
 }
 
 const reducers = {
     'getSelection': getSelectionHandler,
     'noSelectionFound': noSelectionFound,
-    'saveWord': saveWord
+    'saveWord': saveWord,
+    'test': function() {console.log('test')}
 }
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+    console.log(`Content listener received event ${message.action}`)
     try {
         reducers[message.action].call(this, message, sender, sendResponse)
         return true
