@@ -16,6 +16,11 @@ const notify = function (actionName, responseCallback, receiverArgs) {
   )
 }
 
+// Add runtime listener for messages
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  console.log('App.js received a message: ', message)
+})
+
 function App() {
   return <Popup notify={notify}/>;
 }

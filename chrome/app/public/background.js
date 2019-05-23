@@ -1,3 +1,5 @@
+// App.js notify calls this method
+// It sends the message to the content.js script
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     console.log('Background')
     chrome.tabs.query({
@@ -14,10 +16,11 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     })
 })
 
-// chrome.browserAction.onClicked.addListener(function(tab) {
-//     // Send a message to the active tab
-//     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-//         var activeTab = tabs[0];
-//         chrome.tabs.sendMessage(activeTab.id, {action: 'test'});
-//     });
-// });
+// After the content.js script has done its work
+// it sends a message back to this handler
+chrome.runtime.onMessage.addListener(
+    function(message, sender, sendResponse) {
+        console.log('Background received message from content: ', message)
+        chrome.runtime.sendMessage(message);
+    }
+);

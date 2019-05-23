@@ -11,10 +11,12 @@ function getSelectionText() {
 }
 
 const getSelectionHandler = function (_, _, sendResponse) {
-    sendResponse({
+    response = {
         word: getSelectionText(),
         url: window.location.href
-    }); 
+    }
+    console.log('get selection returned', response)
+    sendResponse(response); 
 }
 
 const noSelectionFound = function () {
