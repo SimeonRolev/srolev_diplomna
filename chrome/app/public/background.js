@@ -24,3 +24,7 @@ chrome.runtime.onMessage.addListener(
         chrome.runtime.sendMessage(message);
     }
 );
+
+function createListener (callback) {
+    chrome.runtime.onMessage.addListener(callback)
+}

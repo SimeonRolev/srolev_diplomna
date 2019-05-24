@@ -1,4 +1,7 @@
+/* global chrome */
+
 import React, { Component } from 'react';
+import { notify } from '../notify';
 
 class Popup extends Component {
 
@@ -12,7 +15,12 @@ class Popup extends Component {
     }
 
     componentDidMount () {
-        this.props.notify('getSelection')
+        chrome.runtime.onMessage.addListener(this.messageHandler)
+        notify('getSelection')
+    }
+
+    messageHandler = (message, sender, sendResponse) => {
+        console.log('App.js received a message: ', message)
     }
 
     fillInForm = (resp) => {
@@ -22,12 +30,12 @@ class Popup extends Component {
                 url: resp.url
             })
         } else {
-            this.props.notify('noSelectionFound')
+            notify('noSelectionFound')
         }
     }
 
     save = () => {
-        this.props.notify('saveWord')
+        notify('saveWord')
     }
 
     render () {
