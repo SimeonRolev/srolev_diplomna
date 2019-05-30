@@ -12,25 +12,31 @@ class Popup extends Component {
             url: '',
             notes: ''
         }
+        this.receivers = {
+            'getSelection': this.onGetSelection
+        }
     }
 
     componentDidMount () {
         chrome.runtime.onMessage.addListener(this.messageHandler)
         notify('getSelection')
     }
-
+    
     messageHandler = (message, sender, sendResponse) => {
-        console.log('App.js received a message: ', message)
+        const action = message.action.split('.')[1]
+        if (message.action.split('.')[0] === 'background') {
+            this.receivers[action].call(this, message)
+        }
     }
 
-    fillInForm = (resp) => {
-        if (resp.word) {
+    onGetSelection = (message) => {
+        if (message.word) {
             this.setState({
-                word: resp.word,
-                url: resp.url
+                word: message.word,
+                url: message.url
             })
         } else {
-            notify('noSelectionFound')
+            // notify('noSelectionFound')
         }
     }
 

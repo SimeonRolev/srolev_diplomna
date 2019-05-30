@@ -10,13 +10,11 @@ function getSelectionText() {
     return text;
 }
 
-const getSelectionHandler = function (_, _, sendResponse) {
-    response = {
+const getSelectionHandler = function (message, _, sendResponse) {
+    return {
         word: getSelectionText(),
         url: window.location.href
     }
-    console.log('get selection returned', response)
-    sendResponse(response); 
 }
 
 const noSelectionFound = function () {
@@ -30,14 +28,19 @@ const saveWord = function (message, _, _) {
 const reducers = {
     'getSelection': getSelectionHandler,
     'noSelectionFound': noSelectionFound,
-    'saveWord': saveWord,
-    'test': function() {console.log('test')}
+    'saveWord': saveWord
 }
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-    console.log(`Content listener received event ${message.action}`)
     try {
-        reducers[message.action].call(this, message, sender, sendResponse)
+        const action = message.action.split('.')[1]
+        const response = reducers[action].call(this, message, sender, sendResponse)
+        if (response) {
+            chrome.runtime.sendMessage({
+                action: `content.${action}`,    
+                ...response
+            });
+        }
         return true
     } catch (err) {
         console.log(`Error occured when trying to call action ${message}`)

@@ -4,7 +4,7 @@ const notify = function (actionName, responseCallback, receiverArgs) {
     chrome.runtime.sendMessage(
         'lmkogeccaibbphgfghallpflabohoahj',
         {
-            action: actionName
+            action: `app.${actionName}`
         },
         null,
         responseCallback
