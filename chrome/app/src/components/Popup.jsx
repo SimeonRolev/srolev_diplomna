@@ -5,6 +5,7 @@ import { notify } from '../notify';
 import search from '../translate/aggregator';
 import Collection from '../tools/collection';
 
+
 class Popup extends Component {
 
     constructor(props) {
@@ -12,6 +13,8 @@ class Popup extends Component {
         this.state = {
             word: null,
             url: null,
+            from: 'eng',
+            to: 'bul',
             translations: new Collection([], (item) => item.name),
             translation: '',
             notes: '',
@@ -35,19 +38,14 @@ class Popup extends Component {
     }
 
     translate = () => {
-        this.setState({
-            loading: true
-        })
-
-        const word = this.state.word;
-        const from = 'eng' // Detect language
-        const to = 'bul'
+        this.setState({ loading: true })
+        const { word, from, to } = this.state;
 
         search(word, from, to).then(results => {
             this.setState({
                 translations: new Collection(results, (item) => item.name),
                 loading: false
-            })
+            }, () => results.length && this.selectTranslation(results[0].name))
         })
     }
 
@@ -84,6 +82,14 @@ class Popup extends Component {
         this.setState({ notes: event.target.value });
     }
 
+    handleFromChange = (event) => {
+        this.setState({ from: event.target.value})
+    }
+
+    handleToChange = (event) => {
+        this.setState({ to: event.target.value})
+    }
+
     save = () => {
         notify('saveWord')
     }
@@ -100,6 +106,21 @@ class Popup extends Component {
             <div id='url'>{url}</div>
 
             <hr/>
+            <label>
+                From:
+                <select value={this.state.from} onChange={this.handleFromChange}>
+                    <option value='eng'>English</option>
+                    <option value='bul'>Bulgarian</option>
+                </select>
+            </label>
+            <label>
+                To:
+                <select value={this.state.to} onChange={this.handleToChange}>
+                    <option value='eng'>English</option>
+                    <option value='bul'>Bulgarian</option>
+                </select>
+            </label>
+            
             <h3>Translations:</h3>
             {
                 translations.items.map(t => (
