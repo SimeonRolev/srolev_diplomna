@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { notify } from '../notify';
 import search from '../translate/aggregator';
 import Collection from '../tools/collection';
-
+import WithLoading from '../components/Loading';
 
 class Popup extends Component {
 
@@ -94,7 +94,7 @@ class Popup extends Component {
         notify('saveWord')
     }
 
-    render () {
+    renderContents = () => {
         const { word, url, notes, translation, translations } = this.state;
 
         return <div>
@@ -153,6 +153,10 @@ class Popup extends Component {
             <button onClick={this.save}>Save</button>
             <button onClick={this.translate}>Translate</button>
         </div>
+    }
+
+    render () {
+        return <WithLoading loading={this.state.loading} render={this.renderContents}/>
     }
 }
 
