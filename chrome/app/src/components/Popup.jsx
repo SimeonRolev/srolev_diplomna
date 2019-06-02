@@ -2,6 +2,7 @@
 
 import React, { Component } from 'react';
 import { notify } from '../notify';
+import search from '../translate/aggregator';
 
 class Popup extends Component {
 
@@ -10,7 +11,10 @@ class Popup extends Component {
         this.state = {
             word: '',
             url: '',
-            notes: ''
+            notes: '',
+            translations: [],
+            selectedTranslation: null,
+            loading: false
         }
         this.receivers = {
             'getSelection': this.onGetSelection
@@ -18,7 +22,7 @@ class Popup extends Component {
     }
 
     componentDidMount () {
-        chrome.runtime.onMessage.addListener(this.messageHandler)
+        // chrome.runtime.onMessage.addListener(this.messageHandler)
         notify('getSelection')
     }
     
@@ -29,15 +33,41 @@ class Popup extends Component {
         }
     }
 
-    onGetSelection = (message) => {
-        if (message.word) {
+    translate = () => {
+        const word = 'test';
+        // Detect language
+        const from = 'eng'
+        const to = 'bul'
+
+        // Search in the dictionary aggregator (Elastic search first ?)
+        search(word, from, to).then(results => {
+            console.log(results)
             this.setState({
-                word: message.word,
-                url: message.url
+                translations: results,
+                loading: false
             })
+        })
+    }
+
+    onGetSelection = (message) => {
+        const word = message.word;
+        
+        if (word) {
+            this.setState({
+                word: word,
+                url: message.url,
+                loading: true
+            })
+
+            this.translate();
+            // Suggest notes?
         } else {
-            // notify('noSelectionFound')
+            notify('noSelectionFound')
         }
+    }
+
+    selectTranslation = (name) => {
+        this.setState({selectTranslation: name})
     }
 
     save = () => {
@@ -45,17 +75,30 @@ class Popup extends Component {
     }
 
     render () {
-        const { word, url, notes } = this.state;
+        const { word, url, notes, translations, selectedTranslation } = this.state;
 
         return <div>
             <h3>Word:</h3>
             <div id='word'>{word}</div>
             <h3>Url:</h3>
             <div id='url'>{url}</div>
+            <h3>Translations:</h3>
+            {
+                translations.map(t => (
+                    <div onClick={ () => this.selectTranslation(t.name) }>
+                        <h4>{ t.name }</h4>
+                        <p>{ t.result }</p>
+                    </div>
+                ))
+            }
+
+
+            <textarea id='translations' defaultValue={selectedTranslation && translations[selectedTranslation].result}></textarea>
             <h3>Notes:</h3>
-            <textarea id='notes'>{notes}</textarea>
+            <textarea id='notes' defaultValue={notes}></textarea>
             
             <button onClick={this.save}>Save</button>
+            <button onClick={this.translate}>Translate</button>
         </div>
     }
 }
