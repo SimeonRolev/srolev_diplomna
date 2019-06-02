@@ -3,17 +3,18 @@
 import React, { Component } from 'react';
 import { notify } from '../notify';
 import search from '../translate/aggregator';
+import Collection from '../tools/collection';
 
 class Popup extends Component {
 
     constructor(props) {
         super(props)
         this.state = {
-            word: '',
-            url: '',
+            word: null,
+            url: null,
+            translations: new Collection([], (item) => item.name),
+            translation: '',
             notes: '',
-            translations: [],
-            selectedTranslation: null,
             loading: false
         }
         this.receivers = {
@@ -22,7 +23,7 @@ class Popup extends Component {
     }
 
     componentDidMount () {
-        // chrome.runtime.onMessage.addListener(this.messageHandler)
+        chrome.runtime.onMessage.addListener(this.messageHandler)
         notify('getSelection')
     }
     
@@ -34,16 +35,17 @@ class Popup extends Component {
     }
 
     translate = () => {
-        const word = 'test';
-        // Detect language
-        const from = 'eng'
+        this.setState({
+            loading: true
+        })
+
+        const word = this.state.word;
+        const from = 'eng' // Detect language
         const to = 'bul'
 
-        // Search in the dictionary aggregator (Elastic search first ?)
         search(word, from, to).then(results => {
-            console.log(results)
             this.setState({
-                translations: results,
+                translations: new Collection(results, (item) => item.name),
                 loading: false
             })
         })
@@ -67,7 +69,19 @@ class Popup extends Component {
     }
 
     selectTranslation = (name) => {
-        this.setState({selectTranslation: name})
+        const item = this.state.translations.select(name);
+        this.setState({ 
+            translations: this.state.translations,
+            translation: item.item.result 
+        })
+    }
+
+    editTranslation = (event) => {
+        this.setState({ translation: event.target.value });
+    }
+
+    editNotes = (event) => {
+        this.setState({ notes: event.target.value });
     }
 
     save = () => {
@@ -75,28 +89,46 @@ class Popup extends Component {
     }
 
     render () {
-        const { word, url, notes, translations, selectedTranslation } = this.state;
+        const { word, url, notes, translation, translations } = this.state;
 
         return <div>
             <h3>Word:</h3>
             <div id='word'>{word}</div>
+
+            <hr/>
             <h3>Url:</h3>
             <div id='url'>{url}</div>
+
+            <hr/>
             <h3>Translations:</h3>
             {
-                translations.map(t => (
-                    <div onClick={ () => this.selectTranslation(t.name) }>
-                        <h4>{ t.name }</h4>
-                        <p>{ t.result }</p>
+                translations.items.map(t => (
+                    <div 
+                        key={t.item.name}
+                        onClick={ () => this.selectTranslation(t.item.name) }
+                        style={{ backgroundColor: t.selected ? 'green' : 'transparent' }}
+                    >
+                        <h4>{ t.item.name }</h4>
+                        <p>{ t.item.result }</p>
                     </div>
                 ))
             }
 
-
-            <textarea id='translations' defaultValue={selectedTranslation && translations[selectedTranslation].result}></textarea>
-            <h3>Notes:</h3>
-            <textarea id='notes' defaultValue={notes}></textarea>
+            <textarea 
+                id='translations'
+                value={translation}
+                onChange={this.editTranslation}
+            ></textarea>
             
+            <hr/>
+            <h3>Notes:</h3>
+            <textarea 
+                id='notes'
+                value={notes}
+                onChange={this.editNotes}
+            ></textarea>
+            
+            <hr/>
             <button onClick={this.save}>Save</button>
             <button onClick={this.translate}>Translate</button>
         </div>
