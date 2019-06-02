@@ -3,6 +3,7 @@
 import React, { Component } from 'react';
 import { notify } from '../notify';
 import search from '../translate/aggregator';
+import Collection from '../tools/collection';
 
 class Popup extends Component {
 
@@ -12,8 +13,8 @@ class Popup extends Component {
             word: '',
             url: '',
             notes: '',
-            translations: [],
-            selectedTranslation: null,
+            translations: new Collection([], (item) => item.name),
+            translation: '',
             loading: false
         }
         this.receivers = {
@@ -34,16 +35,18 @@ class Popup extends Component {
     }
 
     translate = () => {
+        this.setState({
+            loading: true
+        })
+
         const word = 'test';
-        // Detect language
-        const from = 'eng'
+        const from = 'eng' // Detect language
         const to = 'bul'
 
         // Search in the dictionary aggregator (Elastic search first ?)
         search(word, from, to).then(results => {
-            console.log(results)
             this.setState({
-                translations: results,
+                translations: new Collection(results, (item) => item.name),
                 loading: false
             })
         })
@@ -67,7 +70,17 @@ class Popup extends Component {
     }
 
     selectTranslation = (name) => {
-        this.setState({selectTranslation: name})
+        const item = this.state.translations.select(name);
+        this.setState({ 
+            translations: this.state.translations,
+            translation: item.item.result 
+        })
+    }
+
+    editTranslation = (event) => {
+        this.setState({
+            translation: event.target.value
+        });
     }
 
     save = () => {
@@ -75,7 +88,7 @@ class Popup extends Component {
     }
 
     render () {
-        const { word, url, notes, translations, selectedTranslation } = this.state;
+        const { word, url, notes, translation, translations } = this.state;
 
         return <div>
             <h3>Word:</h3>
@@ -84,16 +97,24 @@ class Popup extends Component {
             <div id='url'>{url}</div>
             <h3>Translations:</h3>
             {
-                translations.map(t => (
-                    <div onClick={ () => this.selectTranslation(t.name) }>
-                        <h4>{ t.name }</h4>
-                        <p>{ t.result }</p>
+                translations.items.map(t => (
+                    <div 
+                        key={t.item.name}
+                        onClick={ () => this.selectTranslation(t.item.name) }
+                        style={{ backgroundColor: t.selected ? 'green' : 'transparent' }}
+                    >
+                        <h4>{ t.item.name }</h4>
+                        <p>{ t.item.result }</p>
                     </div>
                 ))
             }
 
-
-            <textarea id='translations' defaultValue={selectedTranslation && translations[selectedTranslation].result}></textarea>
+            <textarea 
+                id='translations'
+                value={translation}
+                onChange={this.editTranslation}
+            ></textarea>
+            
             <h3>Notes:</h3>
             <textarea id='notes' defaultValue={notes}></textarea>
             

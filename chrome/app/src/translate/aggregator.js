@@ -8,12 +8,10 @@ const dicts = {
 const search = function (word, from , to) {
     return Promise.all(dicts[from].map(dictInstance => {
         if (dictInstance.supports.includes(to)) {
-            dictInstance.translate(word, from, to)
-        }
-            // return {
-            //     name: dictInstance.name,
-            //     result: 
-            // }
+            return dictInstance.translate(word, from, to).then(res => ({
+                name: dictInstance.name,
+                result: res
+            }))
         }
         return Promise();
     }))
