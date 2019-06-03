@@ -1,20 +1,25 @@
 /* global chrome */
 
 import React, { Component } from 'react';
+
 import { notify } from '../notify';
 import search from '../translate/aggregator';
 import Collection from '../tools/collection';
 import WithLoading from '../components/Loading';
+import iso6392 from 'iso-639-2';
 
 class Popup extends Component {
 
     constructor(props) {
         super(props)
+
+        const userLanguage6932 = navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage)
+        const userLanguage6931 = iso6392.find(lang => lang.iso6391 === userLanguage6932.substring(0, 2)).iso6392B
         this.state = {
             word: null,
             url: null,
             from: 'eng',
-            to: 'bul',
+            to: userLanguage6931,
             translations: new Collection([], (item) => item.name),
             translation: '',
             notes: '',
@@ -26,7 +31,7 @@ class Popup extends Component {
     }
 
     componentDidMount () {
-        chrome.runtime.onMessage.addListener(this.messageHandler)
+        // chrome.runtime.onMessage.addListener(this.messageHandler)
         notify('getSelection')
     }
     

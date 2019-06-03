@@ -1,5 +1,8 @@
 // This script is loaded and embedded in the chrome page
 
+function ()
+
+
 function getSelectionText() {
     var text = "";
     if (window.getSelection) {

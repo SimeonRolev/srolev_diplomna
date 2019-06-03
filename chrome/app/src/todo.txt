@@ -1,5 +1,7 @@
+
+// Detect the browser laungage and set it to default for Popup.state.to
 // DETECT LANGUAGE WITH GOOGLE TRANSLATE AND SET IT TO DEFAULT VALUE FOR Popup.state.from
-// CONTEXT MENU ACTION
 // PORT FROM MOZILLA MOBILE
-// PAGE SCANNER SCANNER
+// Apply compound components pattern
+// PAGE SCANNER
 // How to handle the saved contexts
