@@ -3,6 +3,7 @@ import dummy from './dicts/dummy';
 
 const dicts = {
     'eng': [glosbe, dummy], // List of axios instances
+    'bul': []
 }
 
 const search = function (word, from , to) {
@@ -13,7 +14,9 @@ const search = function (word, from , to) {
                 result: res
             }))
         }
-        return Promise();
+        return new Promise((resolve, reject) => {
+            resolve([])
+        });
     }))
 }
 

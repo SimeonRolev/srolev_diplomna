@@ -1,6 +1,4 @@
-
-// Detect the browser laungage and set it to default for Popup.state.to
-// DETECT LANGUAGE WITH GOOGLE TRANSLATE AND SET IT TO DEFAULT VALUE FOR Popup.state.from
+// Use google translate for detectWordLanguage for Popup.state.from
 // PORT FROM MOZILLA MOBILE
 // Apply compound components pattern
 // PAGE SCANNER

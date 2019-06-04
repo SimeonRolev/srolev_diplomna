@@ -8,20 +8,30 @@ import Collection from '../tools/collection';
 import WithLoading from '../components/Loading';
 import iso6392 from 'iso-639-2';
 
+const PopupContext = React.createContext(); 
+
+const getUserBrowserLanguage = function () {
+    const userLanguage6932 = navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage)
+    const userLanguage6931 = iso6392.find(lang => lang.iso6391 === userLanguage6932.substring(0, 2)).iso6392B
+    return userLanguage6931;
+}
+
+const detectWordLanguage = function (word) {
+    return 'eng'
+}
+
 class Popup extends Component {
 
     constructor(props) {
         super(props)
 
-        const userLanguage6932 = navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage)
-        const userLanguage6931 = iso6392.find(lang => lang.iso6391 === userLanguage6932.substring(0, 2)).iso6392B
         this.state = {
             word: null,
-            url: null,
-            from: 'eng',
-            to: userLanguage6931,
+            from: 'eng', // Detect word language
+            to: 'bgn', // getUserBrowserLanguage()
             translations: new Collection([], (item) => item.name),
             translation: '',
+            url: null,
             notes: '',
             loading: false
         }
@@ -31,7 +41,7 @@ class Popup extends Component {
     }
 
     componentDidMount () {
-        // chrome.runtime.onMessage.addListener(this.messageHandler)
+        chrome.runtime.onMessage.addListener(this.messageHandler)
         notify('getSelection')
     }
     
@@ -60,6 +70,7 @@ class Popup extends Component {
         if (word) {
             this.setState({
                 word: word,
+                from: detectWordLanguage(word),
                 url: message.url,
                 loading: true
             })
@@ -88,48 +99,62 @@ class Popup extends Component {
     }
 
     handleFromChange = (event) => {
-        this.setState({ from: event.target.value})
+        this.setState({ from: event.target.value }, this.translate)
     }
 
     handleToChange = (event) => {
-        this.setState({ to: event.target.value})
+        this.setState({ to: event.target.value }, this.translate)
     }
 
     save = () => {
         notify('saveWord')
     }
 
+    static LanguagePreferences = (props) => {
+        return <PopupContext.Consumer>
+            {context => <div className='from-to-btns'>
+                <label>
+                    From:
+                    <select value={context.from} onChange={props.handleFromChange}>
+                        <option value='eng'>English</option>
+                        <option value='bul'>Bulgarian</option>
+                    </select>
+                </label>
+                <label>
+                    To:
+                    <select value={context.to} onChange={props.handleToChange}>
+                        <option value='eng'>English</option>
+                        <option value='bul'>Bulgarian</option>
+                    </select>
+                </label>
+            </div>
+            }
+        </PopupContext.Consumer>
+    }
+
+    static WordContext = props => {
+        return <PopupContext.Consumer>
+            
+        </PopupContext.Consumer>
+    }
+
     renderContents = () => {
         const { word, url, notes, translation, translations } = this.state;
 
-        return <div>
-            <h3>Word:</h3>
+        return <PopupContext.Provider value={this.state}>
+            <span>Word:</span>
             <div id='word'>{word}</div>
 
             <hr/>
-            <h3>Url:</h3>
-            <div id='url'>{url}</div>
-
-            <hr/>
-            <label>
-                From:
-                <select value={this.state.from} onChange={this.handleFromChange}>
-                    <option value='eng'>English</option>
-                    <option value='bul'>Bulgarian</option>
-                </select>
-            </label>
-            <label>
-                To:
-                <select value={this.state.to} onChange={this.handleToChange}>
-                    <option value='eng'>English</option>
-                    <option value='bul'>Bulgarian</option>
-                </select>
-            </label>
+            <Popup.LanguagePreferences
+                handleFromChange={ this.handleFromChange }
+                handleToChange={ this.handleToChange }
+            />
             
             <h3>Translations:</h3>
             {
                 translations.items.map(t => (
-                    <div 
+                    <div
                         key={t.item.name}
                         onClick={ () => this.selectTranslation(t.item.name) }
                         style={{ backgroundColor: t.selected ? 'green' : 'transparent' }}
@@ -155,10 +180,15 @@ class Popup extends Component {
             ></textarea>
             
             <hr/>
+            <span>Found at url:</span>
+            <div id='url'>{url}</div>
+            
+            <hr/>
             <button onClick={this.save}>Save</button>
             <button onClick={this.translate}>Translate</button>
-        </div>
+        </PopupContext.Provider>
     }
+
 
     render () {
         return <WithLoading loading={this.state.loading} render={this.renderContents}/>
