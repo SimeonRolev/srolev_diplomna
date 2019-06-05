@@ -58,7 +58,13 @@ class Scanner extends Component {
     componentDidMount () {
         this.loadWord()
     }
-
+    
+    componentDidUpdate (nextProps, nextState) {
+        if (this.props.word !== nextProps.word) {
+            this.loadWord()
+        }
+    }
+    
     loadWord () {
         // Call api here
         this.setState({

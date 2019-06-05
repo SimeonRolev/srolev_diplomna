@@ -3,7 +3,7 @@ const scannerStyles = `
         position: fixed;
         top: 5px;
         right: 5px;
-        max-width: 250px;
+        max-width: 300px;
         z-index: 999999;
     }    
 `
