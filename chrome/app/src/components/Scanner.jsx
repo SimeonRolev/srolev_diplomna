@@ -89,7 +89,7 @@ class Scanner extends Component {
         this.props.unmountSelf();
     }
 
-    render() {
+    render () {
         return (
             <Card style={{ position: "relative", margin: 10, backgroundColor: 'white' }}>
                 <CardContent>

@@ -3,5 +3,4 @@
 // Use google translate for detectWordLanguage for Popup.state.from
 // PORT FROM MOZILLA MOBILE
 // Apply compound components pattern
-// PAGE SCANNER
 // How to handle the saved contexts
