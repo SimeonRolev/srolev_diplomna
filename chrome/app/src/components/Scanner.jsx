@@ -167,6 +167,8 @@ class Wrapper extends React.Component {
         this.setState({renderChild: false});
     }
 
+    // BUG: click on one word and without closing the popup, click on another
+    // Only the word gets updated, but the inner contents of the popup don't
     render () {
         return (this.state.renderChild && this.state.word)
             ? <Scanner word={ this.state.word } unmountSelf={this.handleChildUnmount} />

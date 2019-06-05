@@ -26,7 +26,9 @@ try {
     myWords.forEach(word => {
         marker.mark(word, {
             each: (elem) => {
-                elem.onclick = function () {
+                elem.onclick = function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
                     scannerPopup.setWord(elem.innerText);
                 }
             } 
