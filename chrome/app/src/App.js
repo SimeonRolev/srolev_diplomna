@@ -1,12 +1,12 @@
 import React from 'react';
 import './App.css';
 import Popup from './components/Popup'
-import Scanner from './components/Scanner'
+import WordPreviewer from './components/WordPreviewer'
 import ScannerMatches from './components/ScannerMatches'
 
 function App() {
   return <Popup />;
-  // return <Scanner word={'test'} />;
+  // return <WordPreviewer word={'test'} />;
   // return <ScannerMatches matches={{
   //   'fall': [
   //     {onclick: function() { console.log('clicked 1 fall')}},

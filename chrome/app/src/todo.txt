@@ -1,3 +1,5 @@
+// element.scrollIntoView() should scroll the word closer to the center of the display
+// Highlight only the selected word occurrence from the ScannerMatches
 // Add transcription and spaker action on the wor with the word
 // Get context by word
 // Use google translate for detectWordLanguage for Popup.state.from

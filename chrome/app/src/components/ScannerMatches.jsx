@@ -1,9 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
+
+import IconButton from '@material-ui/core/IconButton';
+import NavigateNext from '@material-ui/icons/NavigateNext';   
+import NavigateBefore from '@material-ui/icons/NavigateBefore';   
+
 class ScannerMatches extends Component {
     state = {
-        indexes: {}
+        indexes: {},
+        word: Object.keys(this.props.matches)[0]
     }
 
     getMatchIndex = (word) => {
@@ -52,18 +62,32 @@ class ScannerMatches extends Component {
             return { indexes: Object.assign(oldState.indexes, { [word]: newIndex }) } 
         }, () => this.getClickEvent(word)(event))
     }
-    
-    render () {
-        return <div> {
-            Object.keys(this.props.matches).map(word => {
-                return <div key={word} onClick={ event => this.handleNext(event, word) }>
-                    {word}
-                    <button onClick={ event => this.handleNext(event, word) }>Next</button>
-                    <button onClick={ event => this.handlePrev(event, word) }>Prev</button>
-                </div>
-            })
-        }</div>
 
+    render () {
+        const { word } = this.state;
+
+        return <div>
+                <FormControl>
+                    <InputLabel htmlFor="detected-occurs">Do you remember these?</InputLabel>
+                    <Select
+                        value={this.state.word}
+                        onChange={ e => this.setState({ word: e.target.value }) }
+                        inputProps={{
+                            id: 'detected-occurs'
+                        }}
+                    >
+                        { Object.keys(this.props.matches).map(word => <MenuItem key={word} value={word}>{word}</MenuItem>) }
+                    </Select>
+                </FormControl>
+
+                <br />
+                <IconButton onClick={ event => this.handlePrev(event, word) } edge="start" aria-label="Previous">
+                    <NavigateBefore />
+                </IconButton>
+                <IconButton onClick={ event => this.handleNext(event, word) } edge="end" aria-label="Next">
+                    <NavigateNext />
+                </IconButton>
+        </div>
     }
 }
 

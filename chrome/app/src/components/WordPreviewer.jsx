@@ -53,7 +53,7 @@ const ContextItem = ({ data }) => {
     </ListItem>
 };
 
-class Scanner extends Component {
+class WordPreviewer extends Component {
     constructor (props) {
         super(props);
         this.state = { 
@@ -185,7 +185,7 @@ class Wrapper extends React.Component {
     // Only the word gets updated, but the inner contents of the popup don't
     render () {
         return (this.state.renderChild && this.state.word)
-            ? <Scanner word={ this.state.word } unmountSelf={this.handleChildUnmount} />
+            ? <WordPreviewer word={ this.state.word } unmountSelf={this.handleChildUnmount} />
             : null
     }
 }

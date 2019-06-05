@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Scanner from './components/Scanner';
+import WordPreviewer from './components/WordPreviewer';
 import ScannerMatches from './components/ScannerMatches';
 import { $, jQuery } from 'jquery';
 import './style/scanner.js'
@@ -24,9 +24,9 @@ window.jQuery = jQuery;
 try {
     // eslint-disable-next-line no-undef
     const marker = new Mark(document.body.querySelectorAll('*:not(script):not(noscript)'))
-    const myWords = ['fall', 'reverse'];
+    const myWords = ['fall', 'reverse']; // TODO: Request from user's dictionary
 
-    const scannerPopup = ReactDOM.render(<Scanner />, scanAppRoot);
+    const scannerPopup = ReactDOM.render(<WordPreviewer />, scanAppRoot);
     let matches = {}
 
     myWords.forEach(word => {
@@ -46,10 +46,7 @@ try {
                     scannerPopup.setWord(elem.innerText);
                 }
             },
-            done: () => {
-                console.log(matches);
-                ReactDOM.render(<ScannerMatches matches={matches} />, scanMatchesRoot);
-            }
+            done: () => ReactDOM.render(<ScannerMatches matches={matches} />, scanMatchesRoot)
         });
     })
 } catch (error) {
