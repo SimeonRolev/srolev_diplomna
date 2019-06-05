@@ -41,7 +41,11 @@ class Popup extends Component {
     }
 
     componentDidMount () {
-        chrome.runtime.onMessage.addListener(this.messageHandler)
+        try {
+            chrome.runtime.onMessage.addListener(this.messageHandler)
+        } catch {
+            console.log("Can't load chrome.runtime messages.")
+        }
         notify('getSelection')
     }
     

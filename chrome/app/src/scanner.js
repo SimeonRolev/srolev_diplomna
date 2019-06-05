@@ -2,9 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Scanner from './components/Scanner';
 import { $, jQuery } from 'jquery';
+import './style/scanner.js'
 
 const scanApp = document.createElement('div');
-scanApp.id = "my-extension-root";
+scanApp.id = "scanner-root";
 document.body.appendChild(scanApp);
 
 const markScript = document.createElement('script');
@@ -18,14 +19,19 @@ window.jQuery = jQuery;
 try {
     // eslint-disable-next-line no-undef
     const marker = new Mark(document.body)
-    marker.mark('Started', {
-        each: (elem) => {
-            console.log(elem)
-            elem.onclick = function () {
-                ReactDOM.render(<Scanner />, scanApp)
-            }
-        } 
-    });
+    const myWords = ['fall', 'reverse'];
+
+    const scannerPopup = ReactDOM.render(<Scanner />, scanApp);
+
+    myWords.forEach(word => {
+        marker.mark(word, {
+            each: (elem) => {
+                elem.onclick = function () {
+                    scannerPopup.setWord(elem.innerText);
+                }
+            } 
+        });
+    })
 } catch (error) {
     console.log('Error with marking: ', error);
 }
