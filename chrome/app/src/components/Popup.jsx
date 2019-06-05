@@ -2,6 +2,27 @@
 
 import React, { Component } from 'react';
 
+import Typography from '@material-ui/core/Typography';
+import lightBlue from '@material-ui/core/colors/lightBlue';
+
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListSubheader from '@material-ui/core/ListSubheader';
+import Link from '@material-ui/core/Link';
+import Divider from '@material-ui/core/Divider';
+
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+
 import { notify } from '../notify';
 import search from '../translate/aggregator';
 import Collection from '../tools/collection';
@@ -16,8 +37,24 @@ const getUserBrowserLanguage = function () {
     return userLanguage6931;
 }
 
+// TODO
 const detectWordLanguage = function (word) {
     return 'eng'
+}
+
+const TranslationItem = ({ selected, name, result, selectTranslation }) => {
+    return (
+        <ListItem
+            key={name}
+            onClick={ () => selectTranslation(name) }
+            style={{ backgroundColor: selected ? lightBlue[100] : 'transparent' }}
+        >
+            <ListItemText
+                primary={name}
+                secondary={result}
+            ></ListItemText>
+        </ListItem>
+    )
 }
 
 class Popup extends Component {
@@ -26,9 +63,9 @@ class Popup extends Component {
         super(props)
 
         this.state = {
-            word: null,
+            word: 'test',
             from: 'eng', // Detect word language
-            to: 'bgn', // getUserBrowserLanguage()
+            to: 'bul', // getUserBrowserLanguage()
             translations: new Collection([], (item) => item.name),
             translation: '',
             url: null,
@@ -117,80 +154,121 @@ class Popup extends Component {
     static LanguagePreferences = (props) => {
         return <PopupContext.Consumer>
             {context => <div className='from-to-btns'>
-                <label>
-                    From:
-                    <select value={context.from} onChange={props.handleFromChange}>
-                        <option value='eng'>English</option>
-                        <option value='bul'>Bulgarian</option>
-                    </select>
-                </label>
-                <label>
-                    To:
-                    <select value={context.to} onChange={props.handleToChange}>
-                        <option value='eng'>English</option>
-                        <option value='bul'>Bulgarian</option>
-                    </select>
-                </label>
+                <FormControl>
+                    <InputLabel htmlFor="from-select">From</InputLabel>
+                    <Select
+                        value={context.from}
+                        onChange={props.handleFromChange}
+                        inputProps={{
+                            id: 'from-select',
+                        }}
+                    >
+                        <MenuItem value={'eng'}>English</MenuItem>
+                        <MenuItem value={'bul'}>Bulgarian</MenuItem>
+                    </Select>
+                </FormControl>
+                
+                <FormControl>
+                    <InputLabel htmlFor="to-select">To</InputLabel>
+                    <Select
+                        value={context.to}
+                        onChange={props.handleToChange}
+                        inputProps={{
+                            id: 'to-select',
+                        }}
+                    >
+                        <MenuItem value={'eng'}>English</MenuItem>
+                        <MenuItem value={'bul'}>Bulgarian</MenuItem>
+                    </Select>
+                </FormControl>
             </div>
             }
         </PopupContext.Consumer>
     }
 
-    static WordContext = props => {
-        return <PopupContext.Consumer>
-            
-        </PopupContext.Consumer>
-    }
-
     renderContents = () => {
-        const { word, url, notes, translation, translations } = this.state;
+        const { word, url, translations } = this.state;
 
-        return <PopupContext.Provider value={this.state}>
-            <span>Word:</span>
-            <div id='word'>{word}</div>
+        return (
+            <Card style={{ width: 420 }}>
+                <CardContent>
+                    <PopupContext.Provider value={this.state}>
+                        <Typography variant="h5" component="h2">{ word }</Typography>
 
-            <hr/>
-            <Popup.LanguagePreferences
-                handleFromChange={ this.handleFromChange }
-                handleToChange={ this.handleToChange }
-            />
-            
-            <h3>Translations:</h3>
-            {
-                translations.items.map(t => (
-                    <div
-                        key={t.item.name}
-                        onClick={ () => this.selectTranslation(t.item.name) }
-                        style={{ backgroundColor: t.selected ? 'green' : 'transparent' }}
-                    >
-                        <h4>{ t.item.name }</h4>
-                        <p>{ t.item.result }</p>
-                    </div>
-                ))
-            }
+                        <br />
 
-            <textarea 
-                id='translations'
-                value={translation}
-                onChange={this.editTranslation}
-            ></textarea>
-            
-            <hr/>
-            <h3>Notes:</h3>
-            <textarea 
-                id='notes'
-                value={notes}
-                onChange={this.editNotes}
-            ></textarea>
-            
-            <hr/>
-            <span>Found at url:</span>
-            <div id='url'>{url}</div>
-            
-            <hr/>
-            <button onClick={this.save}>Save</button>
-            <button onClick={this.translate}>Translate</button>
-        </PopupContext.Provider>
+                        <Popup.LanguagePreferences
+                            handleFromChange={ this.handleFromChange }
+                            handleToChange={ this.handleToChange }
+                        />
+
+                        <List
+                            subheader={
+                                <ListSubheader component="div" id="nested-list-subheader">
+                                    Translations:
+                                </ListSubheader>
+                            }
+                        >
+                            {
+                                translations.items.map(t => (
+                                    <TranslationItem
+                                        selected={t.selected}
+                                        name={t.item.name}
+                                        result={t.item.result}
+                                        selectTranslation={ () => this.selectTranslation(t.item.name) }
+                                    />
+                                ))
+                            }
+                        </List>
+
+                        <TextField
+                            label="Translation"
+                            multiline
+                            rowsMax="10"
+                            value={this.state.translation}
+                            onChange={this.editTranslation}
+                            margin="normal"
+                            variant="outlined"
+                            fullWidth
+                        />
+
+                        <Divider />
+
+                        <TextField
+                            label="In what context did you see this word?"
+                            multiline
+                            rowsMax="10"
+                            value={this.state.notes}
+                            onChange={ this.editNotes }
+                            margin="normal"
+                            variant="outlined"
+                            fullWidth
+                        />
+                        
+                        <span>Found at url:</span>
+                        <Link color="textSecondary" target='_blank' href={url}>{url}</Link>
+                        <br />
+                        
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            onClick={this.save}
+                        >
+                            Save
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            color="secondary"
+                            onClick={this.translate}
+                            style={{ float: 'right' }}
+                        >
+                            Translate
+                        </Button>
+
+                    </PopupContext.Provider>
+                </CardContent>
+            </Card>
+        )
     }
 
 
