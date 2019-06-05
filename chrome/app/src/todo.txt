@@ -1,4 +1,4 @@
-
+// Add transcription and spaker action on the wor with the word
 // Get context by word
 // Use google translate for detectWordLanguage for Popup.state.from
 // PORT FROM MOZILLA MOBILE

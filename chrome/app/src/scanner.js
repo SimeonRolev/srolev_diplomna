@@ -25,6 +25,7 @@ try {
 
     myWords.forEach(word => {
         marker.mark(word, {
+            className: 'mark-highlight--page',
             each: (elem) => {
                 elem.onclick = function (event) {
                     event.preventDefault();

@@ -7,6 +7,7 @@
 
 import React, { Component } from 'react';
 import '../style/scanner';
+import Highlighter from "react-highlight-words";
 
 import Typography from '@material-ui/core/Typography';
 
@@ -32,11 +33,18 @@ class Context {
 
 // TODO: highlight the word
 const ContextItem = ({ data }) => {
-    const { notes, url } = data;
+    const { word, notes, url } = data;
     return <ListItem>
         <ListItemText
             className='prev-note'
-            primary={ notes }
+            primary={ 
+                <Highlighter
+                    searchWords={[ word ]}
+                    textToHighlight={notes}
+                    highlightClassName='mark-highlight--note'
+                >
+                </Highlighter>
+            }
             secondary={ 
                 <Link color="textSecondary" target='_blank' href={url}>{url}</Link>
             }
@@ -116,7 +124,7 @@ class Scanner extends Component {
                     {
                         this.state.prevContexts.map((context, index) => {
                             return <React.Fragment key={index} >
-                                <ContextItem data={context} />
+                                <ContextItem data={{ word: this.props.word, ...context }} />
                                 <Divider />
                             </React.Fragment>
                         })
