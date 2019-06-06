@@ -5,15 +5,22 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
 
 import IconButton from '@material-ui/core/IconButton';
 import NavigateNext from '@material-ui/icons/NavigateNext';   
 import NavigateBefore from '@material-ui/icons/NavigateBefore';   
+import Button from '@material-ui/core/Button';
+
+import WordPreviewer from './WordPreviewer';
 
 class ScannerMatches extends Component {
     state = {
-        indexes: {},
-        word: Object.keys(this.props.matches)[0]
+        indexes: {
+            [this.props.word]: 0
+        },
+        word: this.props.word
     }
 
     getMatchIndex = (word) => {
@@ -32,6 +39,10 @@ class ScannerMatches extends Component {
         firstOccurence.onclick(event);
     }
 
+    handleSetWord = (event) => {
+        this.handleNext(event, event.target.value)
+    }
+
     handleNext = (event, word) => {
         event.preventDefault();
         event.stopPropagation();
@@ -45,7 +56,7 @@ class ScannerMatches extends Component {
                 ? index + 1
                 : index;
             return { indexes: Object.assign(oldState.indexes, { [word]: newIndex }) } 
-        }, () => this.getClickEvent(word)(event))
+        }, () => setTimeout( () => this.getClickEvent(word)(event), 0))
     }
 
     handlePrev = (event, word) => {
@@ -63,31 +74,49 @@ class ScannerMatches extends Component {
         }, () => this.getClickEvent(word)(event))
     }
 
+    close = () => {
+        this.props.unmountSelf();
+    }
+
     render () {
         const { word } = this.state;
 
-        return <div>
-                <FormControl>
-                    <InputLabel htmlFor="detected-occurs">Do you remember these?</InputLabel>
-                    <Select
-                        value={this.state.word}
-                        onChange={ e => this.setState({ word: e.target.value }) }
-                        inputProps={{
-                            id: 'detected-occurs'
-                        }}
-                    >
-                        { Object.keys(this.props.matches).map(word => <MenuItem key={word} value={word}>{word}</MenuItem>) }
-                    </Select>
-                </FormControl>
+        return word ?
+        <Card style={{ position: "relative", margin: 10, backgroundColor: 'white' }}>
+            <CardContent>
+                <div style={{ display: 'flex' }}>
+                    <FormControl style={{ flex: 1 }}>
+                        <InputLabel htmlFor="detected-occurs">You have seen these before:</InputLabel>
+                        <Select
+                            value={this.state.word}
+                            onChange={ this.handleSetWord }
+                            inputProps={{
+                                id: 'detected-occurs'
+                            }}
+                        >
+                            { Object.keys(this.props.matches).map(word => <MenuItem key={word} value={word}>{word}</MenuItem>) }
+                        </Select>
+                    </FormControl>
 
-                <br />
-                <IconButton onClick={ event => this.handlePrev(event, word) } edge="start" aria-label="Previous">
-                    <NavigateBefore />
-                </IconButton>
-                <IconButton onClick={ event => this.handleNext(event, word) } edge="end" aria-label="Next">
-                    <NavigateNext />
-                </IconButton>
-        </div>
+                    <IconButton onClick={ event => this.handlePrev(event, word) } edge="start" aria-label="Previous">
+                        <NavigateBefore />
+                    </IconButton>
+                    <IconButton onClick={ event => this.handleNext(event, word) } edge="end" aria-label="Next">
+                        <NavigateNext />
+                    </IconButton>
+                </div>
+
+                <WordPreviewer word={ this.state.word } />
+                <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={this.close}
+                    style={{ float: 'right' }}
+                >
+                    Close
+                </Button>
+            </CardContent>
+        </Card> : null;
     }
 }
 
@@ -95,4 +124,38 @@ ScannerMatches.propTypes = {
 
 };
 
-export default ScannerMatches;
+
+class Wrapper extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            word: Object.keys(this.props.matches)[0],
+            renderChild: true
+        };
+        this.handleChildUnmount = this.handleChildUnmount.bind(this);
+    }
+
+    shouldComponentUpdate (nextProps, nextState) {
+        const result = this.state.word !== nextState.word || this.state.renderChild !== nextState.renderChild
+        return result;
+    }
+
+    setExternal = (state) => {
+        this.setState({
+            ...state,
+            renderChild: true
+        });
+    }
+
+    handleChildUnmount = () => {
+        this.setState({renderChild: false});
+    }
+
+    render () {
+        return (this.state.renderChild && this.state.word)
+            ? <ScannerMatches key={this.state.word} word={this.state.word} { ...this.props } unmountSelf={this.handleChildUnmount} />
+            : null
+    }
+}
+
+export default Wrapper;

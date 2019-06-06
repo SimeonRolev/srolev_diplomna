@@ -5,15 +5,15 @@ const scannerStyles = `
         position: fixed;
         top: 5px;
         right: 5px;
-        width: 300px;
-        z-index: 999999;
+        width: 500px;
+        z-index: 1000;
     }
 
     #scanner-matches-root {
         position: fixed;
         top: 5px;
         right: 5px;
-        width: 150px;
+        width: 250px;
         z-index: 999999;
     }
     

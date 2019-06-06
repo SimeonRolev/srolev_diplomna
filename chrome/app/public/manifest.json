@@ -17,7 +17,7 @@
       "js": [
         "static/js/0.chunk.js",
         "static/js/3.chunk.js",
-        "static/js/4.chunk.js",
+        // "static/js/4.chunk.js",
         "mark.min.js",
         "/static/js/scanner.js",
         "content.js"

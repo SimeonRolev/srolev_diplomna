@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import WordPreviewer from './components/WordPreviewer';
 import ScannerMatches from './components/ScannerMatches';
 import { $, jQuery } from 'jquery';
 import './style/scanner.js'
@@ -8,10 +7,6 @@ import './style/scanner.js'
 const scanAppRoot = document.createElement('div');
 scanAppRoot.id = "scanner-root";
 document.body.appendChild(scanAppRoot);
-
-const scanMatchesRoot = document.createElement('div');
-scanMatchesRoot.id = "scanner-matches-root";
-document.body.appendChild(scanMatchesRoot);
 
 const markScript = document.createElement('script');
 markScript.src = "https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js"
@@ -21,12 +16,12 @@ document.body.appendChild(markScript);
 window.$ = $;
 window.jQuery = jQuery;
 
-try {
+setTimeout(() => {try {
     // eslint-disable-next-line no-undef
     const marker = new Mark(document.body.querySelectorAll('*:not(script):not(noscript)'))
     const myWords = ['fall', 'reverse']; // TODO: Request from user's dictionary
 
-    const scannerPopup = ReactDOM.render(<WordPreviewer />, scanAppRoot);
+    let scannerPopup = null;
     let matches = {}
 
     myWords.forEach(word => {
@@ -43,12 +38,15 @@ try {
                     event.preventDefault();
                     event.stopPropagation();
                     elem.scrollIntoView({block: 'end', behavior: 'smooth'});
-                    scannerPopup.setWord(elem.innerText);
+                    scannerPopup.setExternal({ word: word });
                 }
             },
-            done: () => ReactDOM.render(<ScannerMatches matches={matches} />, scanMatchesRoot)
+            done: () => {
+        
+            }
         });
     })
+    scannerPopup = ReactDOM.render(<ScannerMatches matches={matches} />, scanAppRoot)
 } catch (error) {
     console.log('Error with marking: ', error);
-}
+}}, 1000)
