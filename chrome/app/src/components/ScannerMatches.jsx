@@ -7,6 +7,7 @@ import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
+import Box from '@material-ui/core/Box';
 
 import IconButton from '@material-ui/core/IconButton';
 import NavigateNext from '@material-ui/icons/NavigateNext';   
@@ -14,11 +15,12 @@ import NavigateBefore from '@material-ui/icons/NavigateBefore';
 import Button from '@material-ui/core/Button';
 
 import WordPreviewer from './WordPreviewer';
+import { Typography } from '@material-ui/core';
 
 class ScannerMatches extends Component {
     state = {
         indexes: {
-            [this.props.word]: 0
+            [this.props.word]: this.props.occurrenceIndex
         },
         word: this.props.word
     }
@@ -80,11 +82,13 @@ class ScannerMatches extends Component {
 
     render () {
         const { word } = this.state;
+        const currentOccurrence = this.state.indexes[word];
+        const occurrencesCount = this.props.matches[word].length;
 
         return word ?
         <Card style={{ position: "relative", margin: 10, backgroundColor: 'white' }}>
             <CardContent>
-                <div style={{ display: 'flex' }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
                     <FormControl style={{ flex: 1 }}>
                         <InputLabel htmlFor="detected-occurs">You have seen these before:</InputLabel>
                         <Select
@@ -101,6 +105,11 @@ class ScannerMatches extends Component {
                     <IconButton onClick={ event => this.handlePrev(event, word) } edge="start" aria-label="Previous">
                         <NavigateBefore />
                     </IconButton>
+                    
+                    <Typography style={{ fontSize: 14 }} color="textSecondary">
+                        { currentOccurrence + 1 } / { occurrencesCount } 
+                    </Typography>
+                    
                     <IconButton onClick={ event => this.handleNext(event, word) } edge="end" aria-label="Next">
                         <NavigateNext />
                     </IconButton>
@@ -130,14 +139,10 @@ class Wrapper extends React.Component {
         super(props)
         this.state = {
             word: Object.keys(this.props.matches)[0],
+            occurrenceIndex: 0,
             renderChild: true
         };
         this.handleChildUnmount = this.handleChildUnmount.bind(this);
-    }
-
-    shouldComponentUpdate (nextProps, nextState) {
-        const result = this.state.word !== nextState.word || this.state.renderChild !== nextState.renderChild
-        return result;
     }
 
     setExternal = (state) => {
@@ -153,7 +158,13 @@ class Wrapper extends React.Component {
 
     render () {
         return (this.state.renderChild && this.state.word)
-            ? <ScannerMatches key={this.state.word} word={this.state.word} { ...this.props } unmountSelf={this.handleChildUnmount} />
+            ? <ScannerMatches
+                key={`${this.state.word}${this.state.occurrenceIndex}`}
+                word={this.state.word}
+                occurrenceIndex={this.state.occurrenceIndex}
+                { ...this.props }
+                unmountSelf={this.handleChildUnmount}
+            />
             : null
     }
 }

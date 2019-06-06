@@ -6,13 +6,17 @@ import ScannerMatches from './components/ScannerMatches'
 
 
 const renderComponent = 'Popup';
+// const renderComponent = 'ScannerMatches';
 
 function App() {
   if (renderComponent === 'ScannerMatches') {
     require('./scanner');
     return <div>
       <div style={ {height: 1000} }> Falling in reverse </div>
-      <div style={ {height: 1000} }> Falling in reverse </div>
+      <div style={ {height: 1000} }> Falling in reverse 2</div>
+      <div style={ {height: 1000} }> Falling in reverse 3</div>
+      <div style={ {height: 1000} }> Falling in reverse 4</div>
+      <div style={ {height: 1000} }> Falling in reverse 5</div>
     </div>
   } else if (renderComponent === 'WordPreviewer') {
     return <WordPreviewer word={'test'} />;

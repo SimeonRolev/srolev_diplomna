@@ -16,6 +16,17 @@ document.body.appendChild(markScript);
 window.$ = $;
 window.jQuery = jQuery;
 
+function scrollIntoViewIfNeeded(target) {
+    var rect = target.getBoundingClientRect();
+    if (rect.bottom > window.innerHeight) {
+        // target.scrollIntoView(false);
+        target.scrollIntoView({behavior: 'smooth'});
+    }
+    if (rect.top < 0) {
+        target.scrollIntoView({behavior: 'smooth'});
+    } 
+}
+
 setTimeout(() => {try {
     // eslint-disable-next-line no-undef
     const marker = new Mark(document.body.querySelectorAll('*:not(script):not(noscript)'))
@@ -37,8 +48,9 @@ setTimeout(() => {try {
                 elem.onclick = function (event) {
                     event.preventDefault();
                     event.stopPropagation();
-                    elem.scrollIntoView({block: 'end', behavior: 'smooth'});
-                    scannerPopup.setExternal({ word: word });
+                    scrollIntoViewIfNeeded(elem);
+                    const occurrenceIndex = matches[word].indexOf(elem);
+                    scannerPopup.setExternal({ word, occurrenceIndex });
                 }
             },
             done: () => {
