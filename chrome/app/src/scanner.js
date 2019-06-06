@@ -34,10 +34,21 @@ setTimeout(() => {try {
 
     let scannerPopup = null;
     let matches = {}
+    let currentMatch = null;
+
+    function selectCurrentMatch (elem) {
+        if (currentMatch) {
+            currentMatch.classList.remove('heavy')
+            currentMatch.classList.add('light')
+        }
+        elem.classList.add('heavy')
+        elem.classList.remove('light')
+        currentMatch = elem;
+    }
 
     myWords.forEach(word => {
         marker.mark(word, {
-            className: 'mark-highlight--page',
+            className: 'mark-highlight--page light',
             each: (elem) => {
                 if (matches[word]) {
                     matches[word].push(elem)
@@ -49,12 +60,10 @@ setTimeout(() => {try {
                     event.preventDefault();
                     event.stopPropagation();
                     scrollIntoViewIfNeeded(elem);
+                    selectCurrentMatch(elem);
                     const occurrenceIndex = matches[word].indexOf(elem);
                     scannerPopup.setExternal({ word, occurrenceIndex });
                 }
-            },
-            done: () => {
-        
             }
         });
     })

@@ -1,4 +1,4 @@
-import { markHighlightColor } from './utils/variables';
+import { markHighlightColorLight, markHighlightColorHeavy } from './utils/variables';
 
 const scannerStyles = `
     #scanner-root {
@@ -17,8 +17,12 @@ const scannerStyles = `
         z-index: 999999;
     }
     
-    .mark-highlight--page {
-        background-color: ${markHighlightColor}
+    .mark-highlight--page.light {
+        background-color: ${markHighlightColorLight}
+    }
+    
+    .mark-highlight--page.heavy {
+        background-color: ${markHighlightColorHeavy}
     }
     
     .mark-highlight--note {
