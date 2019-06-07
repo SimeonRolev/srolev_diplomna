@@ -7,7 +7,8 @@ import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import Box from '@material-ui/core/Box';
+import CardActions from '@material-ui/core/CardActions';
+import Collapse from '@material-ui/core/Collapse';
 
 import IconButton from '@material-ui/core/IconButton';
 import NavigateNext from '@material-ui/icons/NavigateNext';   
@@ -22,7 +23,8 @@ class ScannerMatches extends Component {
         indexes: {
             [this.props.word]: this.props.occurrenceIndex
         },
-        word: this.props.word
+        word: this.props.word,
+        expanded: true
     }
 
     getMatchIndex = (word) => {
@@ -76,56 +78,75 @@ class ScannerMatches extends Component {
         }, () => this.getClickEvent(word)(event))
     }
 
+    toggleExpand = () => {
+        this.setState(({ expanded }) => ({ expanded: !expanded }), () => console.log(this.state.expanded))
+    }
+
     close = () => {
         this.props.unmountSelf();
     }
 
     render () {
-        const { word } = this.state;
+        const { word, expanded } = this.state;
         const currentOccurrence = this.state.indexes[word];
         const occurrencesCount = this.props.matches[word].length;
 
         return word ?
-        <Card style={{ position: "relative", margin: 10, backgroundColor: 'white' }}>
-            <CardContent>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <FormControl style={{ flex: 1 }}>
-                        <InputLabel htmlFor="detected-occurs">You have seen these before:</InputLabel>
-                        <Select
-                            value={this.state.word}
-                            onChange={ this.handleSetWord }
-                            inputProps={{
-                                id: 'detected-occurs'
-                            }}
-                        >
-                            { Object.keys(this.props.matches).map(word => <MenuItem key={word} value={word}>{word}</MenuItem>) }
-                        </Select>
-                    </FormControl>
-
-                    <IconButton onClick={ event => this.handlePrev(event, word) } edge="start" aria-label="Previous">
-                        <NavigateBefore />
-                    </IconButton>
-                    
-                    <Typography style={{ fontSize: 14 }} color="textSecondary">
-                        { currentOccurrence + 1 } / { occurrencesCount } 
-                    </Typography>
-                    
-                    <IconButton onClick={ event => this.handleNext(event, word) } edge="end" aria-label="Next">
+            <Card style={{ 
+                position: "relative",
+                margin: 10,
+                backgroundColor: 'white'
+            }}>
+                <CardActions disableSpacing>
+                    <IconButton
+                        aria-expanded={expanded}
+                        onClick={ this.toggleExpand }
+                        aria-label="Expand"
+                    >
                         <NavigateNext />
                     </IconButton>
-                </div>
+                </CardActions>
+                <Collapse in={expanded} timeout="auto">
+                    <CardContent>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <FormControl style={{ flex: 1 }}>
+                                <InputLabel htmlFor="detected-occurs">You have seen these before:</InputLabel>
+                                <Select
+                                    value={this.state.word}
+                                    onChange={ this.handleSetWord }
+                                    inputProps={{
+                                        id: 'detected-occurs'
+                                    }}
+                                >
+                                    { Object.keys(this.props.matches).map(word => <MenuItem key={word} value={word}>{word}</MenuItem>) }
+                                </Select>
+                            </FormControl>
 
-                <WordPreviewer word={ this.state.word } />
-                <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={this.close}
-                    style={{ float: 'right' }}
-                >
-                    Close
-                </Button>
-            </CardContent>
-        </Card> : null;
+                            <IconButton onClick={ event => this.handlePrev(event, word) } edge="start" aria-label="Previous">
+                                <NavigateBefore />
+                            </IconButton>
+                            
+                            <Typography style={{ fontSize: 14 }} color="textSecondary">
+                                { currentOccurrence + 1 } / { occurrencesCount } 
+                            </Typography>
+                            
+                            <IconButton onClick={ event => this.handleNext(event, word) } edge="end" aria-label="Next">
+                                <NavigateNext />
+                            </IconButton>
+                        </div>
+
+                        <WordPreviewer word={ this.state.word } />
+                        <Button
+                            variant="outlined"
+                            color="secondary"
+                            onClick={this.close}
+                            style={{ float: 'right' }}
+                        >
+                            Close
+                        </Button>
+                    </CardContent>
+                </Collapse>
+            </Card> : null;
     }
 }
 

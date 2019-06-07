@@ -5,8 +5,8 @@ import WordPreviewer from './components/WordPreviewer'
 import ScannerMatches from './components/ScannerMatches'
 
 
-const renderComponent = 'Popup';
-// const renderComponent = 'ScannerMatches';
+// const renderComponent = 'Popup';
+const renderComponent = 'ScannerMatches';
 
 function App() {
   if (renderComponent === 'ScannerMatches') {

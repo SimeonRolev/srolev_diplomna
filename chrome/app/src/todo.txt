@@ -1,7 +1,7 @@
-
-// Highlight the current occurence differently?
+// Collapsible
 // Get context by word
-// How to handle the saved contexts
+// How to handle the saved contexts (suggested notes)
+// Better detect hidden elements (detect height/width 0 etc.)
 
 // element.scrollIntoView() should scroll better
 // Add transcription and spaker action on the word with the word
@@ -10,3 +10,5 @@
 
 // Make the component resizable and draggable
 // Optimize renders
+
+// Maybe add the option to translate any word? -Make the word field input editable?
