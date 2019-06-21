@@ -1,12 +1,12 @@
 import React from 'react';
 import './App.css';
-import Popup from './components/Popup'
+import Translator from './components/Translator'
 import WordPreviewer from './components/WordPreviewer'
 import ScannerMatches from './components/ScannerMatches'
 
 
-// const renderComponent = 'Popup';
-const renderComponent = 'ScannerMatches';
+const renderComponent = 'Translator';
+// const renderComponent = 'ScannerMatches';
 
 function App() {
   if (renderComponent === 'ScannerMatches') {
@@ -21,7 +21,7 @@ function App() {
   } else if (renderComponent === 'WordPreviewer') {
     return <WordPreviewer word={'test'} />;
   }
-  return <Popup />
+  return <Translator />
   // return <ScannerMatches matches={{
   //   'fall': [
   //     {onclick: function() { console.log('clicked 1 fall')}},

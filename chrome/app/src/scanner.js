@@ -28,11 +28,12 @@ function scrollIntoViewIfNeeded(target) {
 }
 
 setTimeout(() => {try {
+    // Expand the script so it matches more non-ui elems and describe it in the text
     // eslint-disable-next-line no-undef
     const marker = new Mark(document.body.querySelectorAll('*:not(script):not(noscript)'))
     const myWords = ['fall', 'reverse']; // TODO: Request from user's dictionary
 
-    let scannerPopup = null;
+    let scannerPopup = null;    
     let matches = {}
     let currentMatch = null;
 

@@ -26,7 +26,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { notify } from '../notify';
 import search from '../translate/aggregator';
 import Collection from '../tools/collection';
-import WithLoading from '../components/Loading';
+import WithLoading from './Loading';
 import iso6392 from 'iso-639-2';
 
 const PopupContext = React.createContext(); 
@@ -57,7 +57,7 @@ const TranslationItem = ({ selected, name, result, selectTranslation }) => {
     )
 }
 
-class Popup extends Component {
+class Translator extends Component {
 
     constructor(props) {
         super(props)
@@ -197,7 +197,7 @@ class Popup extends Component {
 
                         <br />
 
-                        <Popup.LanguagePreferences
+                        <Translator.LanguagePreferences
                             handleFromChange={ this.handleFromChange }
                             handleToChange={ this.handleToChange }
                         />
@@ -277,4 +277,4 @@ class Popup extends Component {
     }
 }
 
-export default Popup;
+export default Translator;
