@@ -80,10 +80,10 @@ class Translator extends Component {
     componentDidMount () {
         try {
             chrome.runtime.onMessage.addListener(this.messageHandler)
+            notify('getSelection')
         } catch {
             console.log("Can't load chrome.runtime messages.")
         }
-        notify('getSelection')
     }
     
     messageHandler = (message, sender, sendResponse) => {
@@ -97,7 +97,7 @@ class Translator extends Component {
         this.setState({ loading: true })
         const { word, from, to } = this.state;
 
-        search(word, from, to).then(results => {
+        return search(word, from, to).then(results => {
             this.setState({
                 translations: new Collection(results, (item) => item.name),
                 loading: false
@@ -116,10 +116,11 @@ class Translator extends Component {
                 loading: true
             })
 
-            this.translate();
+            return this.translate();
             // Suggest notes?
         } else {
             notify('noSelectionFound')
+            throw new Error('No selection error');
         }
     }
 
@@ -148,7 +149,7 @@ class Translator extends Component {
     }
 
     save = () => {
-        notify('saveWord')
+        return notify('saveWord', null, {word: this.state.word})
     }
 
     static LanguagePreferences = (props) => {
@@ -186,8 +187,30 @@ class Translator extends Component {
         </PopupContext.Consumer>
     }
 
+    renderTranslations = () => {
+        return <List
+            subheader={
+                <ListSubheader component="div" id="nested-list-subheader">
+                    Translations:
+                </ListSubheader>
+            }
+        >
+            {
+                this.state.translations.items.map(t => (
+                    <TranslationItem
+                        key={t.item.name}
+                        selected={t.selected}
+                        name={t.item.name}
+                        result={t.item.result}
+                        selectTranslation={ () => this.selectTranslation(t.item.name) }
+                    />
+                ))
+            }
+        </List>
+    }
+
     renderContents = () => {
-        const { word, url, translations } = this.state;
+        const { word, url } = this.state;
 
         return (
             <Card style={{ width: 420 }}>
@@ -202,26 +225,10 @@ class Translator extends Component {
                             handleToChange={ this.handleToChange }
                         />
 
-                        <List
-                            subheader={
-                                <ListSubheader component="div" id="nested-list-subheader">
-                                    Translations:
-                                </ListSubheader>
-                            }
-                        >
-                            {
-                                translations.items.map(t => (
-                                    <TranslationItem
-                                        selected={t.selected}
-                                        name={t.item.name}
-                                        result={t.item.result}
-                                        selectTranslation={ () => this.selectTranslation(t.item.name) }
-                                    />
-                                ))
-                            }
-                        </List>
+                        { this.renderTranslations() }
 
                         <TextField
+                            id='translation-field'
                             label="Translation"
                             multiline
                             rowsMax="10"
@@ -235,6 +242,7 @@ class Translator extends Component {
                         <Divider />
 
                         <TextField
+                            id='context-field'
                             label="In what context did you see this word?"
                             multiline
                             rowsMax="10"
@@ -246,23 +254,16 @@ class Translator extends Component {
                         />
                         
                         <span>Found at url:</span>
-                        <Link color="textSecondary" target='_blank' href={url}>{url}</Link>
+                        {url && <Link color="textSecondary" target='_blank' href={url}>{url}</Link>}
                         <br />
                         
                         <Button
                             variant="outlined"
                             color="primary"
                             onClick={this.save}
+                            disabled={!this.state.translation}
                         >
                             Save
-                        </Button>
-                        <Button
-                            variant="outlined"
-                            color="secondary"
-                            onClick={this.translate}
-                            style={{ float: 'right' }}
-                        >
-                            Translate
                         </Button>
 
                     </PopupContext.Provider>
@@ -270,7 +271,6 @@ class Translator extends Component {
             </Card>
         )
     }
-
 
     render () {
         return <WithLoading loading={this.state.loading} render={this.renderContents}/>

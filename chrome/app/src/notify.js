@@ -1,14 +1,20 @@
 /* global chrome */
 
 const notify = function (actionName, responseCallback, receiverArgs) {
-    chrome.runtime.sendMessage(
+    try {
+        chrome.runtime.sendMessage(
         'lmkogeccaibbphgfghallpflabohoahj',
         {
-            action: `app.${actionName}`
+            action: `app.${actionName}`,
+            ...receiverArgs
         },
         null,
-        responseCallback
-    )
+        responseCallback) 
+    } catch {
+        console.log('Can not load chrome messaging kit.')
+    } finally {
+        return actionName
+    }
 }
 
 export { notify };

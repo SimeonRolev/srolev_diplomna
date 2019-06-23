@@ -7,6 +7,7 @@
 
 import React, { Component } from 'react';
 import '../style/scanner';
+import { notify } from '../notify';
 import Highlighter from "react-highlight-words";
 
 import Typography from '@material-ui/core/Typography';
@@ -16,8 +17,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Link from '@material-ui/core/Link';
 import Divider from '@material-ui/core/Divider';
-
-
 
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
@@ -84,10 +83,15 @@ class WordPreviewer extends Component {
         })
     }
 
+    save = () => {
+        notify('saveContext', null, {word: this.props.word})
+    }
+
     render () {
         return (
             <React.Fragment>
                 <TextField
+                    id='translation-field'
                     label="Translations"
                     multiline
                     rowsMax="10"
@@ -117,6 +121,7 @@ class WordPreviewer extends Component {
                 </List>
                 
                 <TextField
+                    id='context-field'
                     label="Add new context:"
                     multiline
                     rowsMax="10"
@@ -128,7 +133,11 @@ class WordPreviewer extends Component {
                 />
                 
                 <br />
-                <Button variant="outlined" color="primary">
+                <Button 
+                    variant="outlined"
+                    color="primary"
+                    disabled={!this.state.context}
+                    onClick={this.save}>
                     Save
                 </Button>
             </React.Fragment>

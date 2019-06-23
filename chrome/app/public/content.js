@@ -23,13 +23,18 @@ const noSelectionFound = function () {
 }
 
 const saveWord = function (message, _, _) {
-    alert(`Successfully saved word "${message}"`)
+    alert(`Successfully saved word "${message.word}"`)
+}
+
+const saveContext = function (message, _, _) {
+    alert(`Successfully saved new context for "${message.word}"`)
 }
 
 const reducers = {
     'getSelection': getSelectionHandler,
     'noSelectionFound': noSelectionFound,
-    'saveWord': saveWord
+    'saveWord': saveWord,
+    'saveContext': saveContext
 }
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {

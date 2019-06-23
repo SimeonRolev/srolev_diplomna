@@ -38,11 +38,6 @@ class ScannerMatches extends Component {
         return this.props.matches[word][i].onclick
     }
 
-    handleMatchClick = (event, word) => {
-        const firstOccurence = this.props.matches[word][2];
-        firstOccurence.onclick(event);
-    }
-
     handleSetWord = (event) => {
         this.handleNext(event, event.target.value)
     }
@@ -50,7 +45,9 @@ class ScannerMatches extends Component {
     handleNext = (event, word) => {
         event.preventDefault();
         event.stopPropagation();
-        event.nativeEvent.stopImmediatePropagation();
+        try {
+            event.nativeEvent.stopImmediatePropagation();
+        } catch {}
 
         const index = this.getMatchIndex(word);
         const occurrances = this.props.matches[word].length;
@@ -66,7 +63,9 @@ class ScannerMatches extends Component {
     handlePrev = (event, word) => {
         event.preventDefault();
         event.stopPropagation();
-        event.nativeEvent.stopImmediatePropagation();
+        try {
+            event.nativeEvent.stopImmediatePropagation();
+        } catch {}
 
         const index = this.getMatchIndex(word);
 
@@ -122,15 +121,15 @@ class ScannerMatches extends Component {
                                 </Select>
                             </FormControl>
 
-                            <IconButton onClick={ event => this.handlePrev(event, word) } edge="start" aria-label="Previous">
+                            <IconButton id='navigate-prev' onClick={ event => this.handlePrev(event, word) } edge="start" aria-label="Previous">
                                 <NavigateBefore />
                             </IconButton>
                             
-                            <Typography style={{ fontSize: 14 }} color="textSecondary">
+                            <Typography id='occurrence-number' style={{ fontSize: 14 }} color="textSecondary">
                                 { currentOccurrence + 1 } / { occurrencesCount } 
                             </Typography>
                             
-                            <IconButton onClick={ event => this.handleNext(event, word) } edge="end" aria-label="Next">
+                            <IconButton id='navigate-next' onClick={ event => this.handleNext(event, word) } edge="end" aria-label="Next">
                                 <NavigateNext />
                             </IconButton>
                         </div>
@@ -158,10 +157,11 @@ ScannerMatches.propTypes = {
 class Wrapper extends React.Component {
     constructor(props) {
         super(props)
+        this.verified = this.props.matches && Object.keys(this.props.matches).length
         this.state = {
-            word: Object.keys(this.props.matches)[0],
+            word: this.verified ? Object.keys(this.props.matches)[0] : null,
             occurrenceIndex: 0,
-            renderChild: true
+            renderChild: this.verified
         };
         this.handleChildUnmount = this.handleChildUnmount.bind(this);
     }
@@ -191,3 +191,4 @@ class Wrapper extends React.Component {
 }
 
 export default Wrapper;
+export { ScannerMatches };
