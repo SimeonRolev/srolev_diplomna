@@ -1,6 +1,7 @@
 /* global chrome */
 
 import React, { Component } from 'react';
+import $ from 'jquery';
 
 import Typography from '@material-ui/core/Typography';
 import lightBlue from '@material-ui/core/colors/lightBlue';
@@ -28,6 +29,7 @@ import search from '../translate/aggregator';
 import Collection from '../tools/collection';
 import WithLoading from './Loading';
 import iso6392 from 'iso-639-2';
+import { api } from '../api';
 
 const PopupContext = React.createContext(); 
 
@@ -149,6 +151,15 @@ class Translator extends Component {
     }
 
     save = () => {
+        api.saveTranslation(
+            1,
+            this.state.word,
+            this.state.translation,
+            this.state.from,
+            this.state.to,
+            this.state.notes,
+            this.state.url
+        )
         return notify('saveWord', null, {word: this.state.word})
     }
 

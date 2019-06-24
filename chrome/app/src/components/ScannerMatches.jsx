@@ -134,7 +134,7 @@ class ScannerMatches extends Component {
                             </IconButton>
                         </div>
 
-                        <WordPreviewer word={ this.state.word } />
+                        <WordPreviewer words={this.props.words} word={ this.state.word } />
                         <Button
                             variant="outlined"
                             color="secondary"

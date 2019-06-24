@@ -7,6 +7,7 @@
 
 import React, { Component } from 'react';
 import '../style/scanner';
+import { api } from '../api';
 import { notify } from '../notify';
 import Highlighter from "react-highlight-words";
 
@@ -57,7 +58,7 @@ class WordPreviewer extends Component {
         this.state = { 
             translation: '',
             prevContexts: [],
-            context: ''
+            context: 'example context'
         }
     }
 
@@ -70,21 +71,34 @@ class WordPreviewer extends Component {
             this.loadWord()
         }
     }
+
+    getWordId = () => {
+        return this.props.words.find(item => item.word === this.props.word).id
+    }
+
+    getWordTranslation = () => {
+        return this.props.words.find(item => item.word === this.props.word).trans
+    }
     
-    loadWord () {
-        // Call api here
-        this.setState({
-            translation: 'Translation of word ' + this.props.word,
-            prevContexts: [
-                new Context({ url: 'https://example.com', notes: `Once upon a time you have found ${this.props.word} somewhere so you cant check it out again here ...`}),
-                new Context({ url: 'https://example.com', notes: `Once upon a time you have found ${this.props.word} somewhere so you cant check it out again here ...`}),
-                new Context({ url: 'https://example.com', notes: `Once upon a time you have found ${this.props.word} somewhere so you cant check it out again here ...`}),
-            ]
-        })
+    loadWord = () => {
+        return api.getContexts(this.getWordId())
+            .done(contexts => {
+                const translation = contexts.length
+                    ? contexts.find(c => c.word === this.props.word)
+                    : this.props.words.find(w => w.id === this.getWordId())
+                this.setState({
+                    translation: translation.trans,
+                    prevContexts: contexts.map(c => new Context({ url: c.url, notes: c.entry }))
+                })
+            })
     }
 
     save = () => {
         notify('saveContext', null, {word: this.props.word})
+        window.$.when(
+            api.updateTranslation(this.getWordId(), this.state.translation),
+            api.saveContext(this.getWordId(), this.state.context, window.location.href)
+        ).always(() => this.loadWord());
     }
 
     render () {
