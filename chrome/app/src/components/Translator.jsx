@@ -1,7 +1,6 @@
 /* global chrome */
 
 import React, { Component } from 'react';
-import $ from 'jquery';
 
 import Typography from '@material-ui/core/Typography';
 import lightBlue from '@material-ui/core/colors/lightBlue';

@@ -1,25 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ScannerMatches from './components/ScannerMatches';
-import { $, jQuery } from 'jquery';
 import './style/scanner.js'
+import {api} from './api';
 
 const scanAppRoot = document.createElement('div');
 scanAppRoot.id = "scanner-root";
 document.body.appendChild(scanAppRoot);
 
-// const markScript = document.createElement('script');
-// markScript.src = "https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js"
-// markScript.charset = "UTF-8"
-// document.body.appendChild(markScript);
-
-// const jQueryScript = document.createElement('script');
-// jQueryScript.src = "https://code.jquery.com/jquery-1.11.3.min.js"
-// jQueryScript.charset = "UTF-8"
-// document.head.appendChild(jQueryScript);
-
-window.$ = $;
-window.jQuery = jQuery;
+const markScript = document.createElement('script');
+markScript.src = "https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js"
+markScript.charset = "UTF-8"
+document.body.appendChild(markScript);
 
 function scrollIntoViewIfNeeded(target) {
     var rect = target.getBoundingClientRect();
@@ -32,22 +24,10 @@ function scrollIntoViewIfNeeded(target) {
     } 
 }
 
-function getWords () {
-    // eslint-disable-next-line no-undef
-    return window.$.ajax({
-        type: "POST",
-        dataType: "json",
-        data: {action: 'getWords'},
-        contentType: "application/json",
-        url: "http://127.0.0.1:5000/",
-        crossDomain: true
-    })
-}
-
-
 setTimeout(() => {try {
     // Expand the script so it matches more non-ui elems and describe it in the text
-    getWords().done(data => {
+    api.getWords().then(resp => {
+        const data = resp.data;
         const myWords = data.map(translation => translation.word)
         // eslint-disable-next-line no-undef
         const marker = new Mark(document.body.querySelectorAll('*:not(script):not(noscript)'))
@@ -88,7 +68,7 @@ setTimeout(() => {try {
             });
         })
         scannerPopup = ReactDOM.render(<ScannerMatches words={data} matches={matches} />, scanAppRoot)
-    }).fail(err => {console.log('error', err)});
+    }).catch(err => {console.log('error', err)});
 } catch (error) {
     console.log('Error with marking: ', error);
 }}, 2000)

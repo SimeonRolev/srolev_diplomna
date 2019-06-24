@@ -124,10 +124,9 @@ const updateTranslation = function ({wordId, trans}) {
 }
 
 createTables();
-// saveTranslation(1, 'fall', 'test1', 'eng', 'bul')
-// saveTranslation(1, 'reverse', 'test1', 'eng', 'bul')
 
-module.exports = { 
+module.exports = {
+    createTables,
     getWords,
     getContexts,
     saveContext,

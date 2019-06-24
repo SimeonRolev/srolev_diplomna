@@ -3,7 +3,8 @@ const {
     getContexts,
     saveContext,
     saveTranslation,
-    updateTranslation
+    updateTranslation,
+    createTables
 } = require('./database');
 const http = require('http');
 const { parse } = require('querystring');
@@ -29,15 +30,15 @@ function requestReducer (req, res) {
         body.push(chunk);
     }).on('end', () => {
         body = Buffer.concat(body).toString();
-        const action = parse(body).action;
-        const params = parse(body);
-
+        
         try {
+            const params = JSON.parse(body)
+            const action = params.action
             databaseActions[action](params).then(data => {
                 res.end(JSON.stringify(data))
             })
         } catch (err) {
-            console.log("Server failed to execute action ", action)
+            console.log("Server failed to execute action ")
             res.end()
         }
     });

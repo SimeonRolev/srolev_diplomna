@@ -82,7 +82,8 @@ class WordPreviewer extends Component {
     
     loadWord = () => {
         return api.getContexts(this.getWordId())
-            .done(contexts => {
+            .then(resp => {
+                const contexts = resp.data;
                 const translation = contexts.length
                     ? contexts.find(c => c.word === this.props.word)
                     : this.props.words.find(w => w.id === this.getWordId())
@@ -95,10 +96,10 @@ class WordPreviewer extends Component {
 
     save = () => {
         notify('saveContext', null, {word: this.props.word})
-        window.$.when(
+        Promise.all([
             api.updateTranslation(this.getWordId(), this.state.translation),
             api.saveContext(this.getWordId(), this.state.context, window.location.href)
-        ).always(() => this.loadWord());
+        ]).then(() => this.loadWord());
     }
 
     render () {

@@ -1,26 +1,21 @@
-import $ from 'jquery';
-
-window.$ = $;
+import axios from 'axios';
 
 export const api = {
     updateTranslation: function (wordId, trans) {
-        return window.$.ajax({
-            type: "POST",
-            dataType: "json",
+        return axios({
+            method: 'post',
             data: {
                 action: 'updateTranslation',
                 wordId: wordId,
                 trans: trans
             },
-            contentType: "application/json",
-            url: "http://127.0.0.1:5000/",
-            crossDomain: true
+            url: "http://127.0.0.1:5000/"
         })
     },
     saveTranslation: function (user, word, trans, from, to, context, url) {
-        return window.$.ajax({
-            type: "POST",
-            dataType: "json",
+        return axios({
+            method: 'post',
+            url: "http://127.0.0.1:5000/",
             data: {
                 action: 'saveTranslation',
                 userId: user,
@@ -30,38 +25,36 @@ export const api = {
                 to: to,
                 context: context,
                 url: url
-            },
-            contentType: "application/json",
-            url: "http://127.0.0.1:5000/",
-            crossDomain: true
+            }
         })
     },
     saveContext: function (translationId, entry, url) {
-        return window.$.ajax({
-            type: "POST",
-            dataType: "json",
+        return axios({
+            method: 'post',
             data: {
                 action: 'saveContext',
                 translationId: translationId,
                 entry: entry,
                 url: url
             },
-            contentType: "application/json",
-            url: "http://127.0.0.1:5000/",
-            crossDomain: true
+            url: "http://127.0.0.1:5000/"
         })
     },
     getContexts: function (translationId) {
-        return window.$.ajax({
-            type: "POST",
-            dataType: "json",
+        return axios({
+            method: 'post',
             data: {
                 action: 'getContexts',
                 translationId: translationId
             },
-            contentType: "application/json",
-            url: "http://127.0.0.1:5000/",
-            crossDomain: true
+            url: "http://127.0.0.1:5000/"
+        })
+    },
+    getWords: function (userId=1) {
+        return axios({
+            method: 'post',
+            data: {action: 'getWords'},
+            url: "http://127.0.0.1:5000/"
         })
     }
 }
