@@ -7,7 +7,7 @@
 
 import React, { Component } from 'react';
 import '../style/scanner';
-import { api } from '../api';
+import { translations, contexts } from '../api';
 import { notify } from '../notify';
 import Highlighter from "react-highlight-words";
 
@@ -81,25 +81,34 @@ class WordPreviewer extends Component {
     }
     
     loadWord = () => {
-        return api.getContexts(this.getWordId())
-            .then(resp => {
-                const contexts = resp.data;
-                const translation = contexts.length
-                    ? contexts.find(c => c.word === this.props.word)
-                    : this.props.words.find(w => w.id === this.getWordId())
-                this.setState({
-                    translation: translation.trans,
-                    prevContexts: contexts.map(c => new Context({ url: c.url, notes: c.entry }))
+        const translationId = this.getWordId()
+
+        return translations.get(translationId).then(({ data: translationData }) => {
+            contexts.get(translationId).then(({ data: contextsData }) => {
+                this.setState({ 
+                    translation: translationData.trans,
+                    prevContexts: contextsData.map(c => new Context({ url: c.url, notes: c.entry }))
                 })
             })
+        })
     }
 
     save = () => {
-        notify('saveContext', null, {word: this.props.word})
-        Promise.all([
-            api.updateTranslation(this.getWordId(), this.state.translation),
-            api.saveContext(this.getWordId(), this.state.context, window.location.href)
-        ]).then(() => this.loadWord());
+        // notify('saveContext', null, {word: this.props.word})
+        translations.update(this.getWordId(), { trans: this.state.translation })
+            .then(({data}) => {
+                contexts.create({
+                    translationId: data.id,
+                    entry: this.state.context,
+                    url: window.location.href
+                }).then(() => {
+                    this.loadWord()
+                })
+            })
+            .catch((err) => {
+                console.log(err);
+                // notify('saveWordFaild', null, {word: this.state.word})
+            })
     }
 
     render () {

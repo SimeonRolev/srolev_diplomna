@@ -7,6 +7,7 @@ import ScannerMatches from './components/ScannerMatches'
 
 const renderComponent = 'Translator';
 // const renderComponent = 'ScannerMatches';
+// const renderComponent = 'WordPreviewer';
 
 function App() {
   if (renderComponent === 'ScannerMatches') {
@@ -14,7 +15,7 @@ function App() {
     return <div>
       <div style={ {height: 1000} }> Falling in reverse </div>
       <div style={ {height: 1000} }> Falling in reverse 2</div>
-      <div style={ {height: 1000} }> Falling in reverse 3</div>
+      <div style={ {height: 1000} }> Falling in redo reverse 3</div>
       <div style={ {height: 1000} }> Falling in reverse 4</div>
       <div style={ {height: 1000} }> Falling in reverse 5</div>
     </div>

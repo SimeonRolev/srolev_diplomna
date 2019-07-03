@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import ScannerMatches from './components/ScannerMatches';
 import './style/scanner.js'
-import {api} from './api';
+import { translations } from './api';
 
 const scanAppRoot = document.createElement('div');
 scanAppRoot.id = "scanner-root";
@@ -26,7 +26,7 @@ function scrollIntoViewIfNeeded(target) {
 
 setTimeout(() => {try {
     // Expand the script so it matches more non-ui elems and describe it in the text
-    api.getWords().then(resp => {
+    translations.getAll().then(resp => {
         const data = resp.data;
         const myWords = data.map(translation => translation.word)
         // eslint-disable-next-line no-undef

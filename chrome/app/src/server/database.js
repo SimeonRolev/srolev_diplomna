@@ -35,101 +35,145 @@ const createTables = function () {
             entry STRING NOT NULL UNIQUE,
             url STRING NOT NULL,
             FOREIGN KEY(translation) REFERENCES translation(id)
+            UNIQUE(translation, entry)
+            ON CONFLICT REPLACE
         )
     `)
 
+    // Create a demo user
     database.run(`
         INSERT OR REPLACE INTO users (id) VALUES (1)
     `)
 }
 
-const getWords = function (userId=1) {
-    return new Promise((resolve, reject) => {
-        database.all(
-            `SELECT * FROM translation WHERE user=1`,
-            [], (err, rows) => {
-            if (err) {
-                reject(err);
-                throw err;
-            }
-            resolve(rows);
+
+const userId = 1;
+
+const translations = {
+    getAll: function () {
+        return new Promise((resolve, reject) => {
+            database.all(`
+                SELECT *
+                FROM translation
+                WHERE user=${userId}
+            `, [], (err, rows) => {
+                if (err) {
+                    reject(err);
+                    throw err;
+                }
+                resolve(rows);
+            })
+        });  
+    },
+    get: function (id) {
+        return new Promise((resolve, reject) => {
+            database.get(`
+                SELECT *
+                FROM translation
+                WHERE user=${userId}
+                AND id=${id}
+            `, [], (err, row) => {
+                    if (err) {
+                        reject(err);
+                        throw err;
+                    }
+                    resolve(row);
+                }
+            )
         })
-    });
-}
-
-const getContexts = function ({ translationId }) {
-    return new Promise((resolve, reject) => {
-        database.all(
-            `SELECT translation.id, word, translation, entry, url, trans FROM context
-            LEFT OUTER JOIN translation
-            ON context.translation = translation.id
-            WHERE translation=${parseInt(translationId)}`,
-            [], (err, rows) => {
-            if (err) {
-                reject(err);
-                throw err;
-            }
-            resolve(rows);
+    },
+    create: function ({ word, translation, from, to }) {
+        return new Promise((resolve, reject) => {
+            database.run(`
+                INSERT INTO translation (
+                    user,
+                    word,
+                    trans,
+                    language_from,
+                    language_to
+                ) VALUES (
+                    ${userId},
+                    "${word}",
+                    "${translation}",
+                    "${from}",
+                    "${to}"
+                );
+            `, [], function (err) {
+                if (err) {
+                    reject(err);
+                    throw err;
+                } else {
+                    resolve({id: this.lastID})
+                }
+            })
         })
-    });
+    },
+    update: function (id, updates={}) {
+        const paredUpdates = Object.entries(updates).map(([key, val]) => {
+                return `${key}=${typeof(val) === 'string' ? `"${val}"` : val}`
+            }).join(',');
+
+        return new Promise((resolve, reject) => {
+            database.run(`
+                UPDATE translation
+                SET ${paredUpdates}
+                WHERE id=${id}
+            `, [], function (err) {
+                if (err) {
+                    reject(err);
+                    throw err;
+                } else {
+                    resolve({id: this.lastID})
+                }
+            })
+        })
+    }
 }
 
-const saveContext = function ({translationId, entry, url}) {
-    database.run(`
-        INSERT OR REPLACE INTO context (
-            translation,
-            entry,
-            url
-        ) VALUES (
-            ${translationId},
-            "${entry}",
-            "${url}"
-        );  
-    `)    
-}
-
-const saveTranslation = function ({userId, word, trans, from, to, context, url}) {
-    
-    console.log(userId, word, trans, from, to, context, url)
-    database.run(`
-        INSERT OR REPLACE INTO translation (
-            user,
-            word,
-            trans,
-            language_from,
-            language_to
-        ) VALUES (
-            ${userId},
-            "${word}",
-            "${trans}",
-            "${from}",
-            "${to}"
-        );
-    `, [], function (err) {
-        if (context) {
-            saveContext({
-                translationId: this.lastID,
-                entry: context,
-                url: url
-            });
-        }
-    })
-    return new Promise();
-}
-
-const updateTranslation = function ({wordId, trans}) {
-    database.run(`
-        UPDATE translation SET trans="${trans}" WHERE id=${parseInt(wordId)}
-    `)
+const contexts = {
+    get: function (translationId) {
+        return new Promise((resolve, reject) => {
+            database.all(`
+                SELECT *
+                FROM context
+                WHERE translation=${translationId}
+            `, [], (err, rows) => {
+                    if (err) {
+                        reject(err);
+                        throw err;
+                    }
+                    resolve(rows);
+                }
+            )
+        })
+    },
+    create: function ({translationId, entry, url}) {
+        return new Promise((resolve, reject) => {
+            database.run(`
+                INSERT OR REPLACE INTO context (
+                    translation,
+                    entry,
+                    url
+                ) VALUES (
+                    ${translationId},
+                    "${entry}",
+                    "${url}"
+                );
+            `, [], function (err) {
+                if (err) {
+                    reject(err);
+                    throw err;
+                }
+                resolve({id: this.lastID})
+            })
+        })
+    }
 }
 
 createTables();
 
 module.exports = {
     createTables,
-    getWords,
-    getContexts,
-    saveContext,
-    saveTranslation,
-    updateTranslation
+    translations,
+    contexts
 }

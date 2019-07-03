@@ -28,7 +28,7 @@ import search from '../translate/aggregator';
 import Collection from '../tools/collection';
 import WithLoading from './Loading';
 import iso6392 from 'iso-639-2';
-import { api } from '../api';
+import { translations, contexts } from '../api';
 
 const PopupContext = React.createContext(); 
 
@@ -64,7 +64,7 @@ class Translator extends Component {
         super(props)
 
         this.state = {
-            word: 'test',
+            word: 'Reverse',
             from: 'eng', // Detect word language
             to: 'bul', // getUserBrowserLanguage()
             translations: new Collection([], (item) => item.name),
@@ -150,16 +150,19 @@ class Translator extends Component {
     }
 
     save = () => {
-        api.saveTranslation(
-            1,
-            this.state.word,
-            this.state.translation,
-            this.state.from,
-            this.state.to,
-            this.state.notes,
-            this.state.url
-        )
-        return notify('saveWord', null, {word: this.state.word})
+        return translations.create(this.state)
+            .then((data) => {
+                contexts.create({
+                    translationId: data.data.id,
+                    entry: this.state.notes,
+                    url: window.location.href
+                })
+                    .then(() => notify('saveWord', null, {word: this.state.word}))
+            })
+            .catch((err) => {
+                console.log(err);
+                // notify('saveWordFaild', null, {word: this.state.word})
+            })
     }
 
     static LanguagePreferences = (props) => {

@@ -32,6 +32,7 @@
     "eslint-plugin-jsx-a11y": "6.2.1",
     "eslint-plugin-react": "7.12.4",
     "eslint-plugin-react-hooks": "^1.5.0",
+    "express": "^4.17.1",
     "file-loader": "3.0.1",
     "fs-extra": "7.0.1",
     "html-webpack-plugin": "4.0.0-beta.5",
@@ -48,6 +49,7 @@
     "mark.js": "^8.11.1",
     "material-ui-icons": "^1.0.0-beta.36",
     "mini-css-extract-plugin": "0.5.0",
+    "nodemon": "^1.19.1",
     "npm": "^6.9.0",
     "optimize-css-assets-webpack-plugin": "5.0.1",
     "pnp-webpack-plugin": "1.2.1",
@@ -77,6 +79,7 @@
   },
   "scripts": {
     "start": "node scripts/start.js",
+    "server": "nodemon src/server/express.js",
     "build": "node scripts/build.js",
     "jest": "jest",
     "test": "node scripts/test.js"

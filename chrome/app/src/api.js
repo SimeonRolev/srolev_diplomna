@@ -1,60 +1,23 @@
 import axios from 'axios';
 
-export const api = {
-    updateTranslation: function (wordId, trans) {
-        return axios({
-            method: 'post',
-            data: {
-                action: 'updateTranslation',
-                wordId: wordId,
-                trans: trans
-            },
-            url: "http://127.0.0.1:5000/"
-        })
-    },
-    saveTranslation: function (user, word, trans, from, to, context, url) {
-        return axios({
-            method: 'post',
-            url: "http://127.0.0.1:5000/",
-            data: {
-                action: 'saveTranslation',
-                userId: user,
-                word: word,
-                trans: trans,
-                from: from,
-                to: to,
-                context: context,
-                url: url
-            }
-        })
-    },
-    saveContext: function (translationId, entry, url) {
-        return axios({
-            method: 'post',
-            data: {
-                action: 'saveContext',
-                translationId: translationId,
-                entry: entry,
-                url: url
-            },
-            url: "http://127.0.0.1:5000/"
-        })
-    },
-    getContexts: function (translationId) {
-        return axios({
-            method: 'post',
-            data: {
-                action: 'getContexts',
-                translationId: translationId
-            },
-            url: "http://127.0.0.1:5000/"
-        })
-    },
-    getWords: function (userId=1) {
-        return axios({
-            method: 'post',
-            data: {action: 'getWords'},
-            url: "http://127.0.0.1:5000/"
-        })
-    }
+const request = axios.create({
+    baseURL: "http://127.0.0.1:5000"
+})
+
+
+const translations = {
+    getAll: () => request.get('/translations'),
+    get: (id) => request.get(`/translations/${id}`),
+    create: (params) => request.post('/translations', params),
+    update: (id, params) => request.put(`/translations/${id}`, params)
 }
+
+const contexts = {
+    get: (id) => request.get(`/contexts/${id}`),
+    create: (params) => request.post('/contexts', params)
+}
+
+export {
+    translations,
+    contexts
+};
