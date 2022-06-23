@@ -45,7 +45,7 @@
     "jest-resolve": "24.7.1",
     "jest-watch-typeahead": "0.3.0",
     "jquery": "^3.4.1",
-    "jsdom": "^15.1.1",
+    "jsdom": "^16.5.0",
     "mark.js": "^8.11.1",
     "material-ui-icons": "^1.0.0-beta.36",
     "mini-css-extract-plugin": "0.5.0",
